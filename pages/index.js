@@ -1,65 +1,105 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import React, { useState, useEffect, Fragment } from "react";
+import { PageHeader, Tabs, Button, Statistic, Descriptions } from "antd";
 
-export default function Home() {
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+import { getBlockchainData } from "../src/services/blockchain-service";
+import styles from "../styles/Home.module.css";
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+import SwapForm from "../src/components/SwapForm";
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+const { TabPane } = Tabs;
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+function Home() {
+  const [account, setAccount] = useState("");
+  const [ethBalance, setEthBalance] = useState({});
+  const [tokenBalance, setTokenBalance] = useState({});
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
+  useEffect(() => {
+    getBlockchainData().then((data) => {
+      setAccount(data.account);
+      setTokenBalance(data.tokenBalanceData);
+      setEthBalance(data.ethBalanceData);
+    });
+  }, []);
 
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
+  const renderContent = () => (
+    <Fragment>
+      <Descriptions title="About" size="small" column={2}>
+        <Descriptions.Item label="Asset">Melody (MLD)</Descriptions.Item>
+        <Descriptions.Item label="Association">
+          <a>421421</a>
+        </Descriptions.Item>
+        <Descriptions.Item label="Creation Time">2021-01-23</Descriptions.Item>
+        <Descriptions.Item label="Exchange Rate">
+          1 ETH = 100 MLD
+        </Descriptions.Item>
+        <Descriptions.Item label="Description">
+          Melody is the musicians crypto coin
+        </Descriptions.Item>
+      </Descriptions>
+      <br />
+      <Descriptions title="Wallet" size="small" column={1}>
+        <Descriptions.Item label="Address">{account}</Descriptions.Item>
+      </Descriptions>
+      <Statistic
+        title="Balance Melody"
+        value={tokenBalance.balance}
+        style={{
+          marginRight: 32,
+        }}
+      />
+      <Statistic title="Balance ETH" value={ethBalance.balance} />
+    </Fragment>
+  );
 
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
+  const headerSignature = () => {
+    return [
+      <img
+        key="1"
+        src={require("../src/assets/eth-logo-name.jpg")}
+        alt="Eth Logo"
+        className={styles.logo}
+      />,
+      <Button key="2">
+        <a target="_blank" href="https://renanlopes.com">
+          By Renan Lopes
         </a>
-      </footer>
-    </div>
-  )
+      </Button>,
+      <Button key="3">
+        <a target="_blank" href="https://github.com/renanlopescoder">
+          GitHub
+        </a>
+      </Button>,
+    ];
+  };
+
+  const getTabs = () => (
+    <Tabs defaultActiveKey="1">
+      <TabPane tab="Details" key="1">
+        Melody crypto coin was created for development and learning purpose
+        <SwapForm
+          ethBalance={ethBalance}
+          account={account}
+          tokenBalance={tokenBalance}
+        />
+      </TabPane>
+      <TabPane tab="Rule" key="2">
+        Sample rules
+      </TabPane>
+    </Tabs>
+  );
+
+  return (
+    <>
+      <PageHeader
+        title="Ethereum Network"
+        subTitle="Swap Ethereum to Melody Crypto Coin"
+        extra={headerSignature()}
+        footer={getTabs()}
+      >
+        {renderContent()}
+      </PageHeader>
+    </>
+  );
 }
+
+export default Home;
