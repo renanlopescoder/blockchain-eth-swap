@@ -1,7 +1,7 @@
 const Token = artifacts.require("Token");
 const EthSwap = artifacts.require("EthSwap");
 
-module.exports = async function(deployer) {
+module.exports = async function (deployer, network, addresses) {
   // Deploy the token to Blockchain
   await deployer.deploy(Token);
   const token = await Token.deployed();
